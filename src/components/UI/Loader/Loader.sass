@@ -1,0 +1,23 @@
+.Loader
+  display: inline-block
+  width: 64px
+  height: 64px
+  position: fixed
+  &:after
+    content: " "
+    display: block
+    width: 46px
+    height: 46px
+    margin: 1px
+    border-radius: 50%
+    border: 5px solid #fff
+    border-color: #fff transparent #fff transparent
+    animation: Loader 1.2s linear infinite
+  &--center
+    text-align: center
+@keyframes Loader
+  0%
+    transform: rotate(0deg)
+  100%
+    transform: rotate(360deg)
+
