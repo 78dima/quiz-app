@@ -1,8 +1,21 @@
-import {FETCH_QUIZES_START, FETCH_QUIZES_SUCCESS, FETCH_QUIZES_ERROR} from "../actions/actionType";
+import {
+    FETCH_QUIZES_START,
+    FETCH_QUIZES_SUCCESS,
+    FETCH_QUIZES_ERROR,
+    FETCH_QUIZ_SUCCESS,
+    QUIZ_SET_STATE,
+    FINISH_QUIZ, QUIZ_NEXT_QUESTION, QUIZ_RETRY
+} from "../actions/actionType";
 
 const initialState = {
-  quizes: [],
-  loading: false
+    quizes: [],
+    loading: false, // Для отображения прелоадера перед загрузкой
+    results: {},
+    activeQuestion: 0, // Тут мы будем увеличивать число и вставлять в индекс массива this.state.quiz[activeQuestion]
+    answerState: null, // Тут мы добавляем классы, при переходе на след. вопрос, класс очищается
+    isFinished: false,
+    quiz: null,
+    error: null
 };
 
 export default function quizReducer(state = initialState, action){
@@ -24,7 +37,37 @@ export default function quizReducer(state = initialState, action){
                 loading: false,
                 error: action.error
             };
-
+        case FETCH_QUIZ_SUCCESS:
+            return{
+                ...state,
+                loading: false,
+                quiz: action.quiz
+            };
+        case QUIZ_SET_STATE:
+            return{
+                ...state,
+                answerState: action.answerState,
+                results: action.results
+            };
+        case FINISH_QUIZ:
+            return{
+                ...state,
+                isFinished: true
+            };
+        case QUIZ_NEXT_QUESTION:
+            return{
+                ...state,
+                answerState: null,
+                activeQuestion: action.number
+            };
+        case QUIZ_RETRY:
+            return{
+                ...state,
+                activeQuestion: 0,
+                answerState: null,
+                isFinished: false,
+                results: {}
+            };
         default:
             return state;
     }

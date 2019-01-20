@@ -10,7 +10,6 @@ class App extends Component {
 
   render() {
     return (
-
           <Layout>
             <Switch>
                 <Route path={'/auth'} component={Auth} />
