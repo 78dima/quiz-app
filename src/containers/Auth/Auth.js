@@ -1,9 +1,10 @@
 import React, {Component} from 'react';
-import axios from 'axios';
 import './Auth.sass';
 import Button from '../../components/UI/Button/Button';
 import Input from '../../components/UI/Input/Input';
 import is from 'is_js';
+import connect from "react-redux/es/connect/connect";
+import {auth} from "../../store/actions/auth";
 
 class Auth extends Component {
 
@@ -37,31 +38,19 @@ class Auth extends Component {
         }
     };
 
-    loginHandler = async ()=>{ // Вход пользователя
-        const authData ={
-            email: this.state.formControls.email.value,
-            password: this.state.formControls.password.value,
-            returnSecureToken: true
-        };
-        try {
-            const response = await axios.post('https://www.googleapis.com/identitytoolkit/v3/relyingparty/verifyPassword?key=AIzaSyCuQhzOaJ3pZ4BHkhjdntZuygLGSqHM_sk', authData); // Обращаемся по rest для авторизации
-            console.log(response.data);
-        }catch (e) {
-            console.log(e);
-        }
+    loginHandler = ()=>{ // Вход пользователя
+        this.props.auth(
+            this.state.formControls.email.value,
+            this.state.formControls.password.value,
+            true
+        );
     };
-    registerHandler = async ()=>{ // Регистрация пользователя
-        const authData ={
-            email: this.state.formControls.email.value,
-            password: this.state.formControls.password.value,
-            returnSecureToken: true
-        };
-        try {
-            const response = await axios.post('https://www.googleapis.com/identitytoolkit/v3/relyingparty/signupNewUser?key=AIzaSyCuQhzOaJ3pZ4BHkhjdntZuygLGSqHM_sk', authData); // Обращаемся по rest для авторизации
-            console.log(response.data);
-        }catch (e) {
-            console.log(e);
-        }
+    registerHandler = ()=>{ // Регистрация пользователя
+        this.props.auth(
+            this.state.formControls.email.value,
+            this.state.formControls.password.value,
+            false
+        );
    };
 
     submitHandler = (e)=>{
@@ -153,4 +142,10 @@ class Auth extends Component {
     }
 }
 
-export default Auth;
+function mapDispatchToProps(dispatch){
+    return{
+        auth: (email, password, isLogin) => dispatch(auth(email, password, isLogin))
+    }
+}
+
+export default connect(null, mapDispatchToProps) (Auth);

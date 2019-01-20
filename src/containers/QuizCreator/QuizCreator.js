@@ -1,11 +1,12 @@
 import React, {Component} from 'react';
-import axios from '../../Axios/axios-quiz';
 import './QuizCreator.sass';
 import Button from '../../components/UI/Button/Button';
 import {createControl, validate, validateForm} from '../../Form/FormFramework';
 import Input from '../../components/UI/Input/Input';
 import Auxiliary from '../../hoc/Auxiliary/Auxiliary';
 import Select from '../../components/UI/Select/Select';
+import {connect} from "react-redux";
+import {createQuizQuestion, finishCreateQuiz} from "../../store/actions/create";
 
 function createOptionControl(number){
     return createControl({
@@ -32,7 +33,6 @@ class QuizCreator extends Component {
 
     state = {
         rightAnswerId: 1,
-        quiz: [],
         isFormValid: false,
         formControls: createFormControls()
 
@@ -44,13 +44,11 @@ class QuizCreator extends Component {
 
     addQuestionHandler = (e)=>{
         e.preventDefault();
-        const quiz = this.state.quiz.concat();
-        const index = quiz.length + 1;
         const {question, option1, option2, option3, option4} = this.state.formControls; //Применяем деструктуризацию
 
         const questionItem = {
             question: question.value,
-            id: index,
+            id: this.props.quiz.length + 1,
             rightAnswerId: this.state.rightAnswerId,
             answers: [
                 {
@@ -64,28 +62,24 @@ class QuizCreator extends Component {
                 }
             ]
         };
-        quiz.push(questionItem);
+
+        this.props.createQuizQuestion(questionItem);
+
         this.setState({
-            quiz,
             rightAnswerId: 1,
             isFormValid: false,
             formControls: createFormControls()
         });
     };
 
-    createQuizHandler = async(e)=>{
+    createQuizHandler = (e)=>{
         e.preventDefault();
-        try{
-            await axios.post('quizes.json', this.state.quiz); // Отправить запрос в первый аргумент URL.json, второй параметр наш стейт
-            this.setState({ // Обнуление состояния стейта после отправки
-                quiz: [],
-                rightAnswerId: 1,
-                isFormValid: false,
-                formControls: createFormControls()
-            });
-        }catch (response) {
-            console.log(response);
-        }
+        this.setState({ // Обнуление состояния стейта после отправки
+            rightAnswerId: 1,
+            isFormValid: false,
+            formControls: createFormControls()
+        });
+        this.props.finishCreateQuiz()
     };
 
     changeHandler = (value, controlName)=>{
@@ -164,7 +158,7 @@ class QuizCreator extends Component {
                             <Button
                                 type={"success"}
                                 onClick={this.createQuizHandler}
-                                disabled={this.state.quiz.length === 0}
+                                disabled={this.props.quiz.length === 0}
                             >
                                 Создать тест
                             </Button>
@@ -177,4 +171,18 @@ class QuizCreator extends Component {
     }
 }
 
-export default QuizCreator;
+function mapStateToProps(state){
+    return {
+        quiz: state.create.quiz
+    }
+}
+
+function mapDispatchToProps(dispatch){
+    return{
+        createQuizQuestion: (item)=> dispatch(createQuizQuestion(item)),
+        finishCreateQuiz: ()=> dispatch(finishCreateQuiz())
+    }
+}
+
+
+export default connect(mapStateToProps, mapDispatchToProps)(QuizCreator);

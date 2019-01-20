@@ -12,7 +12,7 @@ class Quiz extends React.Component{
         this.props.fetchQuizById(this.props.match.params.id);
     }
 
-    componentWillUnmount() {
+    componentWillUnmount() { // Убираем ошибку, если у нас стейт не обновляется, когда мы переходим со страницы теста
         this.props.retryQuiz();
     }
 
